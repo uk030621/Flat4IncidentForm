@@ -60,8 +60,8 @@ export default function IncidentTable() {
               <th className="p-2 border">Time</th>
               <th className="p-2 border">Description</th>
               <th className="p-2 border">Impact</th>
-              <th className="p-2 border">Reported To</th>
-              <th className="p-2 border">Reference No.</th>
+              <th className="p-2 border">Police Involvement</th>
+              <th className="p-2 border">Police Case No.</th>
               <th className="p-2 border">Incident Code</th>
               <th className="p-2 border">Actions</th>
             </tr>
