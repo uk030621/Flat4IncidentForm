@@ -12,19 +12,21 @@ function generateIncidentCode() {
 }
 
 export default function IncidentForm({ onSubmit, initialData }) {
-  const [form, setForm] = useState(
-    initialData || {
-      name: "",
-      email: "",
-      flatNumber: "",
-      date: "",
-      time: "",
-      description: "",
-      impact: "",
-      reportedTo: "",
-      referenceNo: "",
-    }
-  );
+  const emptyForm = {
+    name: "",
+    email: "",
+    flatNumber: "",
+    date: "",
+    time: "",
+    description: "",
+    impact: "",
+    reportedTo: "",
+    referenceNo: "",
+    incidentCode: generateIncidentCode(),
+  };
+
+  const [form, setForm] = useState(initialData || emptyForm);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,13 +45,27 @@ export default function IncidentForm({ onSubmit, initialData }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const data = {
       ...form,
       incidentCode: form.incidentCode || generateIncidentCode(),
     };
-    onSubmit(data);
+
+    const success = await onSubmit(data);
+    if (success) {
+      // reset form and generate new code
+      setForm({
+        ...emptyForm,
+        incidentCode: generateIncidentCode(),
+      });
+
+      // show success message for 5 seconds
+      setSuccessMessage(
+        `✅ Incident ${data.incidentCode} submitted successfully. Letting Agent Has been notified for remedial action.`
+      );
+      setTimeout(() => setSuccessMessage(""), 10000);
+    }
   };
 
   const fields = [
@@ -60,11 +76,7 @@ export default function IncidentForm({ onSubmit, initialData }) {
     { name: "time", label: "Time", type: "time" },
     { name: "description", label: "Description of Incident", type: "text" },
     { name: "impact", label: "Impact on You / Household", type: "text" },
-    {
-      name: "reportedTo",
-      label: "Police involvement?",
-      type: "text",
-    },
+    { name: "reportedTo", label: "Police involvement?", type: "text" },
     { name: "referenceNo", label: "Police Reference No.", type: "text" },
   ];
 
@@ -73,12 +85,18 @@ export default function IncidentForm({ onSubmit, initialData }) {
       onSubmit={handleSubmit}
       className="space-y-4 bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto w-full"
     >
-      <h1 className="text-2xl  mb-4  text-center">
+      <h1 className="text-2xl mb-4 text-center">
         <span className="text-red-700 font-bold">Flat 4</span>
       </h1>
       <h2 className="text-xl font-bold mb-4 text-center">
         Incident Report Form
       </h2>
+
+      {successMessage && (
+        <div className="p-3 text-green-800 bg-green-100 border border-green-300 rounded">
+          {successMessage}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {fields.map(({ name, label, type }) => (
